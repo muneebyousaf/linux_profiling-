@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <papi.h>
-#define NUM_EVENTS 2
+#define NUM_EVENTS 4 
 #define THRESHOLD 10000
 #define ERROR_RETURN(retval) { fprintf(stderr, "Error %d %s:line %d: \n", retval,__FILE__,__LINE__);  exit(retval); }
 /* stupid codes to be monitored */ 
@@ -34,7 +34,21 @@ void computation_add()
 int main()
 {
    /*Declaring and initializing the event set with the presets*/
-   int Events[2] = {PAPI_TOT_INS, PAPI_TOT_CYC};
+
+   /*************************************************************
+    * Event_set1 contains events: Total cycles, Total instructions
+    * executed, Total load/store instructions executed and Total 
+    * branch instructions executed.
+   **************************************************************/ 
+	
+   int Events_set1[NUM_EVENTS] = {PAPI_TOT_CYC,PAPI_TOT_INS,PAPI_LST_INS,PAPI_BR_INS };
+
+   /**************************************************************
+    * Event_set22 contains events: L1 Data cache misses, L1 instruction 
+    * cache misses, L2 Data cache misses and L2 instruction cache misses
+   **************************************************************/ 
+   int Events_set2[NUM_EVENTS] = { PAPI_L1_DCM,PAPI_L1_ICM,PAPI_L2_DCM,PAPI_L2_ICM};
+				   
    /*The length of the events array should be no longer than the
      value returned by PAPI_num_counters.*/     
        
@@ -75,8 +89,13 @@ int main()
     * implicitly stops and initializes any counters running as a result of   *
     * a previous call to PAPI_start_counters.                                *
     **************************************************************************/
-       
-   if ( (retval = PAPI_start_counters(Events, NUM_EVENTS)) != PAPI_OK)
+  
+   /*start time sampling*/     
+   start_cycles =PAPI_get_real_cyc();
+   start_usec   = PAPI_get_real_usec();
+
+
+   if ( (retval = PAPI_start_counters(Events_set1, NUM_EVENTS)) != PAPI_OK)
        ERROR_RETURN(retval);
    printf("\nCounter Started: \n");
    /* Your code goes here*/
@@ -89,43 +108,24 @@ int main()
    if ( (retval=PAPI_read_counters(values, NUM_EVENTS)) != PAPI_OK)
       ERROR_RETURN(retval);
    printf("Read successfully\n");
-   printf("The total instructions executed for addition are %lld \n",values[0]);
-   printf("The total cycles used are %lld \n", values[1] );
-       
-   printf("\nNow we try to use PAPI_accum to accumulate values\n"); 
-  
-   start_cycles =PAPI_get_real_cyc();
-   start_usec   = PAPI_get_real_usec();
- /* Do some computation here */
-   computation_add();
-   end_cycles =PAPI_get_real_cyc();
-   end_usec   = PAPI_get_real_usec();
-     
- 
-   /************************************************************************
-    * What PAPI_accum_counters does is it adds the running counter values  *
-    * to what is in the values array. The hardware counters are reset and  *
-    * left running after the call.                                         *
-    ************************************************************************/
-   if ( (retval=PAPI_accum_counters(values, NUM_EVENTS)) != PAPI_OK)
-      ERROR_RETURN(retval);
-   printf("We did an additional %d times addition!\n", THRESHOLD);
-   printf("The total instructions executed for addition are %lld \n",
-                        values[0] );
-   printf("The total cycles used are %lld \n", values[1] );
 
- printf("Wallclock cycles  : %lld\nWallclock time(us): %lld\n",end_cycles-start_cycles,end_usec-start_usec);
 
-   /***********************************************************************
-    * Stop counting events(this reads the counters as well as stops them  *
-    ***********************************************************************/
-   printf("\nNow we try to do some multiplications\n");
-   computation_mult();
    /******************* PAPI_stop_counters **********************************/
    if ((retval=PAPI_stop_counters(values, NUM_EVENTS)) != PAPI_OK)
-      ERROR_RETURN(retval);     
-   printf("The total instruction executed for multiplication are %lld \n",
-               values[0] );
-   printf("The total cycles used are %lld \n", values[1] );
+      ERROR_RETURN(retval); 
+  
+    /* stop time sampling*/ 
+   end_cycles =PAPI_get_real_cyc();
+   end_usec   = PAPI_get_real_usec();
+
+   printf("counter are stopped");     
+
+       
+   printf("The total cycles used are %lld \n", values[0] );
+   printf("The total instructions executed for addition are %lld \n",values[1]);
+   printf("The total load/store instructions executed for addition are  %lld \n", values[2] );
+   printf("The total branch instructions executed for addition are %lld \n",values[3]);
+   printf("Wallclock cycles  : %lld\nWallclock time(us): %lld\n",end_cycles-start_cycles,end_usec-start_usec);
+  
    exit(0);     
 }
