@@ -13,14 +13,18 @@ int thread_fn(void);
 int thread_fn() {
 
 unsigned long j0,j1;
-int delay = 10*HZ;
+int delay = 1*HZ;
+int count = 0 ;
+int cpu = 1; 
 while(1){
 	printk(KERN_INFO "In thread1");
 	j0 = jiffies;
 	j1 = j0 + delay;
-
+	count++;
 	while (time_before(jiffies, j1))
         	schedule();
+
+	
 	if ( kthread_should_stop() == true)
 	{
 	  break;
@@ -36,10 +40,15 @@ int thread_init (void) {
     printk(KERN_INFO "in init");
     thread1 = kthread_create(thread_fn,NULL,our_thread);
     if((thread1))
-        {
+     {
         printk(KERN_INFO "in if");
         wake_up_process(thread1);
-        }
+     }
+
+	
+	kthread_bind(thread1,0);
+
+    
 
     return 0;
 }
