@@ -1,0 +1,1 @@
+cmd_/home/obc/kernel_thread/threads.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/obc/kernel_thread/threads.ko /home/obc/kernel_thread/threads.o /home/obc/kernel_thread/threads.mod.o
