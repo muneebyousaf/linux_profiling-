@@ -9,7 +9,7 @@
 #default:
  #  $(MAKE) -C $(KERNELDIR) M=$(PWD) modules 
 
-EXTRA_CFLAGS:=-I/usr/local/include -I/usr/include -I/usr/include/x86_64-linux-gnu
+EXTRA_CFLAGS:=-I/usr/local/include -I/usr/include  -I/usr/include/linux -I/usr/include/x86_64-linux-gnu
 
 obj-m:=mymodule.o
 mymodule-objs:=threads.o papi.o libpapi.a

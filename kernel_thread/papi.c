@@ -6,12 +6,15 @@
 *     PAPI_TOT_CYC: Total cpu cycles in a period of time                             *
 ******************************************************************************/ 
 //#include <stdio.h>
-//#include <stdlib.h>
+#include <stddef.h>
 #include <papi.h>
 #define NUM_EVENTS 4 
 #define THRESHOLD 10000
-#define ERROR_RETURN(retval) { fprintf(stderr, "Error %d %s:line %d: \n", retval,__FILE__,__LINE__);  exit(retval); }
+//#define ERROR_RETURN(retval) { fprintf(stderr, "Error %d %s:line %d: \n", retval,__FILE__,__LINE__);  exit(retval); }
 /* stupid codes to be monitored */ 
+void computation_mult(void);
+void computation_add(void);
+int my_main(void);
 void computation_mult()
 {
    double tmp=1.0;
@@ -31,7 +34,7 @@ void computation_add()
       tmp = tmp + i;
    }
 }
-int main()
+int my_main(void)
 {
    /*Declaring and initializing the event set with the presets*/
 
@@ -74,7 +77,7 @@ int main()
    if((retval = PAPI_library_init(PAPI_VER_CURRENT)) != PAPI_VER_CURRENT )
    {
 //      fprintf(stderr, "Error: %d %s\n",retval, errstring);
-      exit(1);
+   //   exit(1);
    }
 
 
@@ -86,7 +89,7 @@ int main()
    if ((num_hwcntrs = PAPI_num_counters()) < PAPI_OK)
    {
   //    printf("There are no counters available. \n");
-      exit(1);
+    //  exit(1);
    }
   // printf("There are %d counters in this system\n",num_hwcntrs);
                
@@ -103,7 +106,7 @@ int main()
 
 
    if ( (retval = PAPI_start_counters(Events_set1, 3)) != PAPI_OK)
-       ERROR_RETURN(retval);
+     //  ERROR_RETURN(retval);
   // printf("\nCounter Started: \n");
    /* Your code goes here*/
    computation_add();
@@ -113,13 +116,13 @@ int main()
     * PAPI_read_counters reads the counter values into values array      *
     **********************************************************************/
    if ( (retval=PAPI_read_counters(values, 3)) != PAPI_OK)
-      ERROR_RETURN(retval);
+     // ERROR_RETURN(retval);
   // printf("Read successfully\n");
 
 
    /******************* PAPI_stop_counters **********************************/
    if ((retval=PAPI_stop_counters(values, 3)) != PAPI_OK)
-      ERROR_RETURN(retval); 
+     // ERROR_RETURN(retval); 
   
     /* stop time sampling*/ 
    end_cycles =PAPI_get_real_cyc();
@@ -145,7 +148,7 @@ int main()
 
 
    if ( (retval = PAPI_start_counters(Events_set2, 2)) != PAPI_OK)
-       ERROR_RETURN(retval);
+       //ERROR_RETURN(retval);
 
 
  //  printf("\nCounter Started: \n");
@@ -157,13 +160,13 @@ int main()
     * PAPI_read_counters reads the counter values into values array      *
     **********************************************************************/
    if ( (retval=PAPI_read_counters(values, 2)) != PAPI_OK)
-      ERROR_RETURN(retval);
+     // ERROR_RETURN(retval);
    //printf("Read successfully\n");
 
 
    /******************* PAPI_stop_counters **********************************/
    if ((retval=PAPI_stop_counters(values, 2)) != PAPI_OK)
-      ERROR_RETURN(retval); 
+     // ERROR_RETURN(retval); 
   
     /* stop time sampling*/ 
    end_cycles =PAPI_get_real_cyc();
@@ -178,5 +181,5 @@ int main()
    printf("Wallclock cycles  : %lld\nWallclock time(us): %lld\n",end_cycles-start_cycles,end_usec-start_usec);
 */
   
-   exit(0);     
+  // exit(0);     
 }

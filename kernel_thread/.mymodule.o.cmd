@@ -1,0 +1,1 @@
+cmd_/home/obc/github/linux_profiling-/kernel_thread/mymodule.o := ld -m elf_x86_64   -r -o /home/obc/github/linux_profiling-/kernel_thread/mymodule.o /home/obc/github/linux_profiling-/kernel_thread/threads.o /home/obc/github/linux_profiling-/kernel_thread/papi.o /home/obc/github/linux_profiling-/kernel_thread/libpapi.a 

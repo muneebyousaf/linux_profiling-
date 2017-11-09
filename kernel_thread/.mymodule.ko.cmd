@@ -1,0 +1,1 @@
+cmd_/home/obc/github/linux_profiling-/kernel_thread/mymodule.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/obc/github/linux_profiling-/kernel_thread/mymodule.ko /home/obc/github/linux_profiling-/kernel_thread/mymodule.o /home/obc/github/linux_profiling-/kernel_thread/mymodule.mod.o
