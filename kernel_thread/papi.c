@@ -1,4 +1,4 @@
-/*****************************************************************************
+/*d*****************************************************************************
 *  This example code shows how to use most of PAPI's High level functions    *
 *  to start,count,read and stop on an event set. We use two preset events    *
 *  here:                                                                     *
