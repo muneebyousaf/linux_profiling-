@@ -1,15 +1,13 @@
-#include <linux/kmod.h>
+
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/kthread.h>  // for threads
 #include <linux/sched.h>  // for task_struct
 #include <linux/time.h>   // for using jiffies 
 #include <linux/timer.h>
-#include <linux/init.h>
-#include <linux/gfp.h>
-static struct task_struct *thread1;
-static int umh_test( void );
 
+static struct task_struct *thread1;
+static int umh_test( int);
 
 int thread_fn(void); 
 int thread_fn() {
@@ -27,6 +25,9 @@ while(1){
 	{
 	  break;
 	}
+
+	 umh_test( j0);
+	printk(KERN_INFO "after the calling fuction \n");
 }
 
 return 0;
@@ -47,6 +48,17 @@ int thread_init (void) {
 }
 
 
+static int umh_test(int  mynum )
+{
+  char *argv[] = { "/home/obc/github/linux_profiling-/test_app/test", NULL };
+  static char *envp[] = {
+        "HOME=/",
+        "TERM=linux",
+	"SHELL=/bin/bash"
+        "PATH=/sbin:/bin:/usr/sbin:/usr/bin", NULL };
+ 
+ return call_usermodehelper( argv[0], argv, envp, UMH_WAIT_PROC );
+}
 
 void thread_cleanup(void) {
  int ret;
@@ -55,33 +67,7 @@ void thread_cleanup(void) {
   printk(KERN_INFO "Thread stopped");
 
 }
-
-
-static int __init mod_entry_func( void )
-{
-  return umh_test();
-}
-
-static void __exit mod_exit_func( void )
-{
-  return;
-}
-
- 
-static int umh_test( void )
-{
-char *argv[] = { "/usr/bin/logger", "help!", NULL };
-  static char *envp[] = {
-        "HOME=/",
-        "TERM=bash",
-        "PATH=/sbin:/bin:/usr/sbin:/usr/bin", NULL };
- 
-  return call_usermodehelper( argv[0], argv, envp, UMH_WAIT_PROC );
-}
-
 MODULE_LICENSE("GPL");   
-//module_init(thread_init);
-//module_exit(thread_cleanup);
-module_init( mod_entry_func );
-module_exit( mod_exit_func );
+module_init(thread_init);
+module_exit(thread_cleanup);
 

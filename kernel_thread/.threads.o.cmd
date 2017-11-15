@@ -3,29 +3,43 @@ cmd_/home/obc/github/linux_profiling-/kernel_thread/threads.o := gcc -Wp,-MD,/ho
 source_/home/obc/github/linux_profiling-/kernel_thread/threads.o := /home/obc/github/linux_profiling-/kernel_thread/threads.c
 
 deps_/home/obc/github/linux_profiling-/kernel_thread/threads.o := \
-  include/linux/kmod.h \
+  include/linux/module.h \
     $(wildcard include/config/modules.h) \
-  include/linux/gfp.h \
-    $(wildcard include/config/highmem.h) \
-    $(wildcard include/config/zone/dma.h) \
-    $(wildcard include/config/zone/dma32.h) \
-    $(wildcard include/config/zone/device.h) \
-    $(wildcard include/config/numa.h) \
-    $(wildcard include/config/deferred/struct/page/init.h) \
-    $(wildcard include/config/pm/sleep.h) \
-    $(wildcard include/config/cma.h) \
-  include/linux/mmdebug.h \
-    $(wildcard include/config/debug/vm.h) \
-    $(wildcard include/config/debug/virtual.h) \
-  include/linux/bug.h \
+    $(wildcard include/config/sysfs.h) \
+    $(wildcard include/config/module/sig.h) \
+    $(wildcard include/config/modules/tree/lookup.h) \
+    $(wildcard include/config/unused/symbols.h) \
     $(wildcard include/config/generic/bug.h) \
-  arch/x86/include/asm/bug.h \
-    $(wildcard include/config/debug/bugverbose.h) \
-    $(wildcard include/config/x86/32.h) \
-  include/asm-generic/bug.h \
-    $(wildcard include/config/bug.h) \
-    $(wildcard include/config/generic/bug/relative/pointers.h) \
+    $(wildcard include/config/kallsyms.h) \
     $(wildcard include/config/smp.h) \
+    $(wildcard include/config/tracepoints.h) \
+    $(wildcard include/config/tracing.h) \
+    $(wildcard include/config/event/tracing.h) \
+    $(wildcard include/config/ftrace/mcount/record.h) \
+    $(wildcard include/config/livepatch.h) \
+    $(wildcard include/config/module/unload.h) \
+    $(wildcard include/config/constructors.h) \
+    $(wildcard include/config/debug/set/module/ronx.h) \
+  include/linux/list.h \
+    $(wildcard include/config/debug/list.h) \
+  include/linux/types.h \
+    $(wildcard include/config/have/uid16.h) \
+    $(wildcard include/config/uid16.h) \
+    $(wildcard include/config/lbdaf.h) \
+    $(wildcard include/config/arch/dma/addr/t/64bit.h) \
+    $(wildcard include/config/phys/addr/t/64bit.h) \
+    $(wildcard include/config/64bit.h) \
+  include/uapi/linux/types.h \
+  arch/x86/include/uapi/asm/types.h \
+  include/uapi/asm-generic/types.h \
+  include/asm-generic/int-ll64.h \
+  include/uapi/asm-generic/int-ll64.h \
+  arch/x86/include/uapi/asm/bitsperlong.h \
+  include/asm-generic/bitsperlong.h \
+  include/uapi/asm-generic/bitsperlong.h \
+  include/uapi/linux/posix_types.h \
+  include/linux/stddef.h \
+  include/uapi/linux/stddef.h \
   include/linux/compiler.h \
     $(wildcard include/config/sparse/rcu/pointer.h) \
     $(wildcard include/config/trace/branch/profiling.h) \
@@ -39,45 +53,28 @@ deps_/home/obc/github/linux_profiling-/kernel_thread/threads.o := \
     $(wildcard include/config/optimize/inlining.h) \
     $(wildcard include/config/gcov/kernel.h) \
     $(wildcard include/config/arch/use/builtin/bswap.h) \
-  include/uapi/linux/types.h \
-  arch/x86/include/uapi/asm/types.h \
-  include/uapi/asm-generic/types.h \
-  include/asm-generic/int-ll64.h \
-  include/uapi/asm-generic/int-ll64.h \
-  arch/x86/include/uapi/asm/bitsperlong.h \
-  include/asm-generic/bitsperlong.h \
-    $(wildcard include/config/64bit.h) \
-  include/uapi/asm-generic/bitsperlong.h \
-  include/uapi/linux/posix_types.h \
-  include/linux/stddef.h \
-  include/uapi/linux/stddef.h \
   arch/x86/include/asm/posix_types.h \
+    $(wildcard include/config/x86/32.h) \
   arch/x86/include/uapi/asm/posix_types_64.h \
   include/uapi/asm-generic/posix_types.h \
+  include/linux/poison.h \
+    $(wildcard include/config/illegal/pointer/value.h) \
+  include/uapi/linux/const.h \
   include/linux/kernel.h \
-    $(wildcard include/config/lbdaf.h) \
     $(wildcard include/config/preempt/voluntary.h) \
     $(wildcard include/config/debug/atomic/sleep.h) \
     $(wildcard include/config/mmu.h) \
     $(wildcard include/config/prove/locking.h) \
     $(wildcard include/config/panic/timeout.h) \
-    $(wildcard include/config/tracing.h) \
-    $(wildcard include/config/ftrace/mcount/record.h) \
   /usr/lib/gcc/x86_64-linux-gnu/4.8/include/stdarg.h \
   include/linux/linkage.h \
   include/linux/stringify.h \
   include/linux/export.h \
     $(wildcard include/config/have/underscore/symbol/prefix.h) \
     $(wildcard include/config/modversions.h) \
-    $(wildcard include/config/unused/symbols.h) \
   arch/x86/include/asm/linkage.h \
     $(wildcard include/config/x86/64.h) \
     $(wildcard include/config/x86/alignment/16.h) \
-  include/linux/types.h \
-    $(wildcard include/config/have/uid16.h) \
-    $(wildcard include/config/uid16.h) \
-    $(wildcard include/config/arch/dma/addr/t/64bit.h) \
-    $(wildcard include/config/phys/addr/t/64bit.h) \
   include/linux/bitops.h \
   arch/x86/include/asm/bitops.h \
     $(wildcard include/config/x86/cmov.h) \
@@ -89,7 +86,6 @@ deps_/home/obc/github/linux_profiling-/kernel_thread/threads.o := \
   arch/x86/include/asm/segment.h \
     $(wildcard include/config/cc/stackprotector.h) \
     $(wildcard include/config/x86/32/lazy/gs.h) \
-  include/uapi/linux/const.h \
   arch/x86/include/asm/cache.h \
     $(wildcard include/config/x86/l1/cache/shift.h) \
     $(wildcard include/config/x86/internode/cache/shift.h) \
@@ -176,42 +172,22 @@ deps_/home/obc/github/linux_profiling-/kernel_thread/threads.o := \
   include/uapi/linux/kernel.h \
   include/uapi/linux/sysinfo.h \
   include/linux/dynamic_debug.h \
-  include/linux/mmzone.h \
-    $(wildcard include/config/force/max/zoneorder.h) \
-    $(wildcard include/config/memory/isolation.h) \
-    $(wildcard include/config/memcg.h) \
-    $(wildcard include/config/memory/hotplug.h) \
-    $(wildcard include/config/compaction.h) \
-    $(wildcard include/config/discontigmem.h) \
-    $(wildcard include/config/flat/node/mem/map.h) \
-    $(wildcard include/config/page/extension.h) \
-    $(wildcard include/config/no/bootmem.h) \
-    $(wildcard include/config/numa/balancing.h) \
-    $(wildcard include/config/have/memory/present.h) \
-    $(wildcard include/config/have/memoryless/nodes.h) \
-    $(wildcard include/config/need/node/memmap/size.h) \
-    $(wildcard include/config/have/memblock/node/map.h) \
-    $(wildcard include/config/need/multiple/nodes.h) \
-    $(wildcard include/config/have/arch/early/pfn/to/nid.h) \
-    $(wildcard include/config/flatmem.h) \
-    $(wildcard include/config/sparsemem/extreme.h) \
-    $(wildcard include/config/have/arch/pfn/valid.h) \
-    $(wildcard include/config/holes/in/zone.h) \
-    $(wildcard include/config/arch/has/holes/memorymodel.h) \
+  include/linux/stat.h \
+  arch/x86/include/uapi/asm/stat.h \
+  include/uapi/linux/stat.h \
+  include/linux/time.h \
+    $(wildcard include/config/arch/uses/gettimeoffset.h) \
+  include/linux/seqlock.h \
+    $(wildcard include/config/debug/lock/alloc.h) \
   include/linux/spinlock.h \
     $(wildcard include/config/debug/spinlock.h) \
     $(wildcard include/config/generic/lockbreak.h) \
     $(wildcard include/config/preempt.h) \
-    $(wildcard include/config/debug/lock/alloc.h) \
   include/linux/preempt.h \
     $(wildcard include/config/preempt/count.h) \
     $(wildcard include/config/debug/preempt.h) \
     $(wildcard include/config/preempt/tracer.h) \
     $(wildcard include/config/preempt/notifiers.h) \
-  include/linux/list.h \
-    $(wildcard include/config/debug/list.h) \
-  include/linux/poison.h \
-    $(wildcard include/config/illegal/pointer/value.h) \
   arch/x86/include/asm/preempt.h \
   arch/x86/include/asm/percpu.h \
     $(wildcard include/config/x86/64/smp.h) \
@@ -224,13 +200,22 @@ deps_/home/obc/github/linux_profiling-/kernel_thread/threads.o := \
   include/linux/thread_info.h \
     $(wildcard include/config/compat.h) \
     $(wildcard include/config/debug/stack/usage.h) \
+  include/linux/bug.h \
+  arch/x86/include/asm/bug.h \
+    $(wildcard include/config/debug/bugverbose.h) \
+  include/asm-generic/bug.h \
+    $(wildcard include/config/bug.h) \
+    $(wildcard include/config/generic/bug/relative/pointers.h) \
   arch/x86/include/asm/thread_info.h \
     $(wildcard include/config/ia32/emulation.h) \
   arch/x86/include/asm/page.h \
   arch/x86/include/asm/page_64.h \
+    $(wildcard include/config/debug/virtual.h) \
+    $(wildcard include/config/flatmem.h) \
     $(wildcard include/config/x86/vsyscall/emulation.h) \
   include/linux/range.h \
   include/asm-generic/memory_model.h \
+    $(wildcard include/config/discontigmem.h) \
     $(wildcard include/config/sparsemem/vmemmap.h) \
   include/asm-generic/getorder.h \
   arch/x86/include/asm/cpufeature.h \
@@ -336,11 +321,48 @@ deps_/home/obc/github/linux_profiling-/kernel_thread/threads.o := \
     $(wildcard include/config/inline/write/unlock/irq.h) \
     $(wildcard include/config/inline/read/unlock/irqrestore.h) \
     $(wildcard include/config/inline/write/unlock/irqrestore.h) \
+  include/linux/time64.h \
+  include/uapi/linux/time.h \
+  include/linux/uidgid.h \
+    $(wildcard include/config/multiuser.h) \
+    $(wildcard include/config/user/ns.h) \
+  include/linux/highuid.h \
+  include/linux/kmod.h \
+  include/linux/gfp.h \
+    $(wildcard include/config/highmem.h) \
+    $(wildcard include/config/zone/dma.h) \
+    $(wildcard include/config/zone/dma32.h) \
+    $(wildcard include/config/zone/device.h) \
+    $(wildcard include/config/numa.h) \
+    $(wildcard include/config/deferred/struct/page/init.h) \
+    $(wildcard include/config/pm/sleep.h) \
+    $(wildcard include/config/cma.h) \
+  include/linux/mmdebug.h \
+    $(wildcard include/config/debug/vm.h) \
+  include/linux/mmzone.h \
+    $(wildcard include/config/force/max/zoneorder.h) \
+    $(wildcard include/config/memory/isolation.h) \
+    $(wildcard include/config/memcg.h) \
+    $(wildcard include/config/memory/hotplug.h) \
+    $(wildcard include/config/compaction.h) \
+    $(wildcard include/config/flat/node/mem/map.h) \
+    $(wildcard include/config/page/extension.h) \
+    $(wildcard include/config/no/bootmem.h) \
+    $(wildcard include/config/numa/balancing.h) \
+    $(wildcard include/config/have/memory/present.h) \
+    $(wildcard include/config/have/memoryless/nodes.h) \
+    $(wildcard include/config/need/node/memmap/size.h) \
+    $(wildcard include/config/have/memblock/node/map.h) \
+    $(wildcard include/config/need/multiple/nodes.h) \
+    $(wildcard include/config/have/arch/early/pfn/to/nid.h) \
+    $(wildcard include/config/sparsemem/extreme.h) \
+    $(wildcard include/config/have/arch/pfn/valid.h) \
+    $(wildcard include/config/holes/in/zone.h) \
+    $(wildcard include/config/arch/has/holes/memorymodel.h) \
   include/linux/wait.h \
   include/uapi/linux/wait.h \
   include/linux/numa.h \
     $(wildcard include/config/nodes/shift.h) \
-  include/linux/seqlock.h \
   include/linux/nodemask.h \
     $(wildcard include/config/movable/node.h) \
   include/linux/pageblock-flags.h \
@@ -383,10 +405,6 @@ deps_/home/obc/github/linux_profiling-/kernel_thread/threads.o := \
     $(wildcard include/config/debug/objects.h) \
     $(wildcard include/config/debug/objects/free.h) \
   include/linux/ktime.h \
-  include/linux/time.h \
-    $(wildcard include/config/arch/uses/gettimeoffset.h) \
-  include/linux/time64.h \
-  include/uapi/linux/time.h \
   include/linux/jiffies.h \
   include/linux/timex.h \
   include/uapi/linux/timex.h \
@@ -404,7 +422,6 @@ deps_/home/obc/github/linux_profiling-/kernel_thread/threads.o := \
   include/linux/workqueue.h \
     $(wildcard include/config/debug/objects/work.h) \
     $(wildcard include/config/freezer.h) \
-    $(wildcard include/config/sysfs.h) \
   include/linux/timer.h \
     $(wildcard include/config/timer/stats.h) \
     $(wildcard include/config/debug/objects/timers.h) \
@@ -515,23 +532,6 @@ deps_/home/obc/github/linux_profiling-/kernel_thread/threads.o := \
     $(wildcard include/config/need/per/cpu/embed/first/chunk.h) \
     $(wildcard include/config/need/per/cpu/page/first/chunk.h) \
   include/linux/pfn.h \
-  include/linux/module.h \
-    $(wildcard include/config/module/sig.h) \
-    $(wildcard include/config/modules/tree/lookup.h) \
-    $(wildcard include/config/kallsyms.h) \
-    $(wildcard include/config/tracepoints.h) \
-    $(wildcard include/config/event/tracing.h) \
-    $(wildcard include/config/livepatch.h) \
-    $(wildcard include/config/module/unload.h) \
-    $(wildcard include/config/constructors.h) \
-    $(wildcard include/config/debug/set/module/ronx.h) \
-  include/linux/stat.h \
-  arch/x86/include/uapi/asm/stat.h \
-  include/uapi/linux/stat.h \
-  include/linux/uidgid.h \
-    $(wildcard include/config/multiuser.h) \
-    $(wildcard include/config/user/ns.h) \
-  include/linux/highuid.h \
   include/linux/elf.h \
   arch/x86/include/asm/elf.h \
     $(wildcard include/config/x86/x32/abi.h) \
