@@ -1,10 +1,17 @@
-
+#include <linux/fcntl.h>
+#include <linux/sys/mman.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/kthread.h>  // for threads
 #include <linux/sched.h>  // for task_struct
 #include <linux/time.h>   // for using jiffies 
 #include <linux/timer.h>
+
+#define FILEPATH "/tmp/mmapped.bin"
+#define NUMINTS  (1000)
+#define FILESIZE (NUMINTS * sizeof(int))
+
+
 
 static struct task_struct *thread1;
 static int umh_test( int);
@@ -14,6 +21,34 @@ int thread_fn() {
 
 unsigned long j0,j1;
 int delay = 10*HZ;
+
+int fd;
+
+int *map;  /* mmapped array of int's */
+
+fd = open(FILEPATH, O_RDONLY);
+    if (fd == -1) {
+	printk(KERN_INFO"Error opening file for reading");
+	return 0;
+    }
+map = mmap(0, FILESIZE, PROT_READ, MAP_SHARED, fd, 0);
+if(map == MAP_FAILED) {
+	close(fd);
+	printk(KERN_INFO"Erroe in maping the file");
+	return 0; 
+   }
+
+/* Read the file int-by-int from the mmap
+     */
+    for (i = 1; i <=NUMINTS; ++i) {
+	printk(KERN_INFO"%d: %d\n", i, map[i]);
+    }
+
+    if (munmap(map, FILESIZE) == -1) {
+	printk(KERN_INFO"Error un-mmapping the file");
+    }
+    close(fd);
+
 while(1){
 	printk(KERN_INFO "In thread1");
 	j0 = jiffies;
