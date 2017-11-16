@@ -1,19 +1,29 @@
-#include <linux/fcntl.h>
-#include <linux/sys/mman.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/kthread.h>  // for threads
 #include <linux/sched.h>  // for task_struct
 #include <linux/time.h>   // for using jiffies 
 #include <linux/timer.h>
-
-#define FILEPATH "/tmp/mmapped.bin"
+#include <linux/proc_fs.h>
+#include <asm/uaccess.h>
+#include <linux/string.h>
+#include <linux/vmalloc.h>
 #define NUMINTS  (1000)
 #define FILESIZE (NUMINTS * sizeof(int))
 
+#define MAX_COOKIE_LENGTH       PAGE_SIZE
+
+static struct proc_dir_entry *proc_entry;
+ 
+static char *cookie_pot;  // Space for fortune strings
+ 
+static int cookie_index;  // Index to write next fortune
+ 
+static int next_fortune;  // Index to read next fortune
 
 
-static struct task_struct *thread1;
+
+ struct task_struct *thread1;
 static int umh_test( int);
 
 int thread_fn(void); 
@@ -21,34 +31,6 @@ int thread_fn() {
 
 unsigned long j0,j1;
 int delay = 10*HZ;
-
-int fd;
-
-int *map;  /* mmapped array of int's */
-
-fd = open(FILEPATH, O_RDONLY);
-    if (fd == -1) {
-	printk(KERN_INFO"Error opening file for reading");
-	return 0;
-    }
-map = mmap(0, FILESIZE, PROT_READ, MAP_SHARED, fd, 0);
-if(map == MAP_FAILED) {
-	close(fd);
-	printk(KERN_INFO"Erroe in maping the file");
-	return 0; 
-   }
-
-/* Read the file int-by-int from the mmap
-     */
-    for (i = 1; i <=NUMINTS; ++i) {
-	printk(KERN_INFO"%d: %d\n", i, map[i]);
-    }
-
-    if (munmap(map, FILESIZE) == -1) {
-	printk(KERN_INFO"Error un-mmapping the file");
-    }
-    close(fd);
-
 while(1){
 	printk(KERN_INFO "In thread1");
 	j0 = jiffies;
@@ -69,7 +51,9 @@ return 0;
 }
 
 int thread_init (void) {
-   
+  
+
+    int ret = 0 ;  
     char  our_thread[8]="thread1";
     printk(KERN_INFO "in init");
     thread1 = kthread_create(thread_fn,NULL,our_thread);
@@ -79,7 +63,40 @@ int thread_init (void) {
         wake_up_process(thread1);
         }
 
-    return 0;
+	cookie_pot = (char *)vmalloc( MAX_COOKIE_LENGTH );
+
+	if (!cookie_pot) {
+ 
+    		ret = -ENOMEM;
+ 
+  	} else {
+		 memset( cookie_pot, 0, MAX_COOKIE_LENGTH );
+
+		 proc_entry=proc_create( "fortune", 0644, NULL );
+		
+		 if (proc_entry == NULL) {
+			 ret = -ENOMEM;
+ 
+     			 vfree(cookie_pot);
+ 
+      			printk(KERN_INFO "fortune: Couldn't create proc entry\n");
+		}
+		else{
+			cookie_index = 0;
+ 
+     			 next_fortune = 0;
+
+			proc_entry->read_proc = fortune_read;
+			proc_entry->write_proc = fortune_write;
+			proc_entry->owner = THIS_MODULE;
+			printk(KERN_INFO "fortune: Module loaded.\n");
+ 
+		    }
+	}
+
+   
+
+    return ret ;
 }
 
 
@@ -101,6 +118,91 @@ void thread_cleanup(void) {
  if(!ret)
   printk(KERN_INFO "Thread stopped");
 
+vfree(cookie_pot);
+
+}
+
+ssize_t fortune_write( struct file *filp, const char __user *buff,
+ 
+                        unsigned long len, void *data )
+ 
+{
+ 
+  int space_available = (MAX_COOKIE_LENGTH-cookie_index)+1;
+ 
+ 
+ 
+  if (len > space_available) {
+ 
+ 
+ 
+    printk(KERN_INFO "fortune: cookie pot is full!\n");
+ 
+    return -ENOSPC;
+ 
+ 
+ 
+  }
+ 
+ 
+ 
+  if (copy_from_user( &cookie_pot[cookie_index], buff, len )) {
+ 
+    return -EFAULT;
+ 
+  }
+ 
+ 
+ 
+  cookie_index += len;
+ 
+  cookie_pot[cookie_index-1] = 0;
+ 
+ 
+ 
+  return len;
+ 
+}
+
+
+
+
+int fortune_read( char *page, char **start, off_t off,
+ 
+                   int count, int *eof, void *data )
+ 
+{
+ 
+  int len;
+ 
+ 
+ 
+  if (off > 0) {
+ 
+    *eof = 1;
+ 
+    return 0;
+ 
+  }
+ 
+ 
+ 
+  /* Wrap-around */
+ 
+  if (next_fortune >= cookie_index) next_fortune = 0;
+ 
+ 
+ 
+  len = sprintf(page, "%s\n", &cookie_pot[next_fortune]);
+ 
+ 
+ 
+  next_fortune += len;
+ 
+ 
+ 
+  return len;
+ 
 }
 MODULE_LICENSE("GPL");   
 module_init(thread_init);

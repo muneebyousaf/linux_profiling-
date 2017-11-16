@@ -1,3 +1,5 @@
+EXTRA_CFLAGS:= -I/usr/include/x86_64-linux-gnu -I/usr/include
+
 obj-m:=threads.o
 
 all:
