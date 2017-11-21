@@ -5,6 +5,7 @@
 #include<fcntl.h>
 #include<string.h>
 #include<unistd.h>
+#include<string.h>
 
 #define BUFFER_LENGTH 256               ///< The buffer length (crude but fine)
 static char receive[BUFFER_LENGTH];     ///< The receive buffer from the LKM
@@ -16,7 +17,7 @@ static char receive[BUFFER_LENGTH];     ///< The receive buffer from the LKM
 
 #define FILEPATH "/home/obc/github/linux_profiling-/test_app/emp.txt"
 
-int main(void){
+int main(int argc, char **argv){
 
  FILE *fptr;
     char name[20];
@@ -30,6 +31,9 @@ char stringToSend[BUFFER_LENGTH]= "Muhammad muneeb yousaf";
   fptr = fopen(FILEPATH, "wr+");
 
 // fptr = fopen(FILEPATH,O_RDWR|O_CREAT);
+
+	strcpy(stringToSend,argv[1]);
+	//printf("The given arguments are %s \n", stringToSend);
  
     if (fptr == NULL)
     {

@@ -20,7 +20,7 @@ MODULE_VERSION("0.1");            ///< A version number to inform users
 
 
  struct task_struct *thread1;
-static int umh_test( int);
+static int umh_test( unsigned char);
 
 int thread_fn(void); 
 /* all these data sturcture are for communication with file*/
@@ -58,6 +58,7 @@ int thread_fn() {
 
 unsigned long j0,j1;
 int delay = 10*HZ;
+unsigned char ab ; 
 while(1){
 	printk(KERN_INFO "In thread1");
 	j0 = jiffies;
@@ -69,10 +70,10 @@ while(1){
 	{
 	  break;
 	}
-	
+	ab = j0; 
 	printk(KERN_INFO" The message receive from user: ");
 	printk(KERN_INFO"%s\n",message);
-	 umh_test( j0);
+	 umh_test( ab);
 	printk(KERN_INFO "after the calling fuction \n");
 }
 
@@ -135,9 +136,9 @@ int thread_init (void) {
 }
 
 
-static int umh_test(int  mynum )
+static int umh_test(unsigned char  mynum )
 {
-  char *argv[] = { "/home/obc/github/linux_profiling-/test_app/test", NULL };
+  char *argv[] = { "/home/obc/github/linux_profiling-/test_app/test"," I am feeling Great !!!",NULL };
   static char *envp[] = {
         "HOME=/",
         "TERM=linux",
