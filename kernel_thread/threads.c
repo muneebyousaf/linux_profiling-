@@ -20,9 +20,12 @@ MODULE_VERSION("0.1");            ///< A version number to inform users
 
 
 struct task_struct *thread1;
+
+struct task_struct *thread2;
 static int Hook_User_App(void);
 
 int thread_fn(void); 
+int thread_fn2(void); 
 /* all these data sturcture are for communication with file*/
 
 static int    majorNumber;                  ///< Stores the device number -- determined automatically
@@ -57,11 +60,17 @@ static struct file_operations fops =
 /**********************************************************/
 
 
+int thread_fn2() {
+
+      	printk(KERN_INFO " It is from thread2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+	return 0; 
+}
 int thread_fn() {
 
 unsigned long j0,j1;
-int delay = 10*HZ;
+int delay = 20*HZ;
 unsigned char ab ;
+char our_thread2[8]="Thread2";
 
  
 while(1){
@@ -71,6 +80,15 @@ while(1){
 
 	while (time_before(jiffies, j1))
         	schedule();
+
+	 thread2= kthread_create(thread_fn2,NULL,our_thread2);
+    	if((thread2)){
+        	wake_up_process(thread2);
+        	printk(KERN_INFO "Thread 1 has started running\n");
+    	}
+	else
+        	printk(KERN_INFO "Thread 2 not created \n");
+
 	if ( kthread_should_stop() == true)
 	{
 	  break;
