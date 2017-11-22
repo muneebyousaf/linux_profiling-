@@ -9,7 +9,6 @@
 #include <linux/string.h>
 #include <linux/vmalloc.h>
 #include <linux/device.h>
-
 #define  DEVICE_NAME "UTK_Buffer"    ///UTK: User To Kernel<The device will appear at /dev/ebbchar using this value
 #define  CLASS_NAME  "UTK"       ///< The device class -- this is a character device driver
 
@@ -18,7 +17,7 @@ MODULE_AUTHOR("Muhammad muneeb yousaf");    ///< The author -- visible when you 
 MODULE_DESCRIPTION("This module is being created for communicatin between kernel and user");  ///< The description -- see modinfo
 MODULE_VERSION("0.1");            ///< A version number to inform users
 
-
+unsigned int t2_counter= 0; 
 struct task_struct *thread1;
 
 struct task_struct *thread2;
@@ -62,8 +61,37 @@ static struct file_operations fops =
 
 int thread_fn2() {
 
-      	printk(KERN_INFO " It is from thread2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-	return 0; 
+ unsigned long j0,j1;
+ int delay = 20*HZ;
+int a =10;
+char buffer[20];
+char mythread[20]="thread";
+
+while(1){
+	
+		
+	sprintf(buffer,"%d",a);
+
+	strcat(mythread,buffer);
+	printk(KERN_INFO " Result of cancatination%s\n",mythread);
+	printk(KERN_INFO "In thread2\n");
+	j0 = jiffies;
+	j1 = j0 + delay;
+
+	while (time_before(jiffies, j1))
+        	schedule();
+
+
+	if ( kthread_should_stop() == true)
+	{
+	  break;
+	}
+	t2_counter++;
+	printk(KERN_INFO " It is from thread2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+
+ 
+ }
+ return 0; 
 }
 int thread_fn() {
 
@@ -72,6 +100,9 @@ int delay = 20*HZ;
 unsigned char ab ;
 char our_thread2[8]="Thread2";
 
+unsigned char thread2_running_flag = 0;
+
+int ret2;
  
 while(1){
 	printk(KERN_INFO "In thread1\n");
@@ -81,13 +112,35 @@ while(1){
 	while (time_before(jiffies, j1))
         	schedule();
 
-	 thread2= kthread_create(thread_fn2,NULL,our_thread2);
-    	if((thread2)){
-        	wake_up_process(thread2);
-        	printk(KERN_INFO "Thread 1 has started running\n");
+	if ((message[0] == 3)&& (thread2_running_flag == 2)){
+
+		thread2_running_flag = 0;
+	} 
+	
+	/**********Create Thread2**********************/
+	if(thread2_running_flag == 0U ){
+	 	thread2= kthread_create(thread_fn2,NULL,our_thread2);
+    		if((thread2)){
+        		wake_up_process(thread2);
+			thread2_running_flag = 1; 
+        		printk(KERN_INFO "Thread 1 has started running\n");
+		}
     	}
 	else
-        	printk(KERN_INFO "Thread 2 not created \n");
+        printk(KERN_INFO "Thread 2 not created \n");
+
+	/**************************************************/
+	/****Stop thread2********************************/
+
+	if(t2_counter >= 2){
+
+		ret2 = kthread_stop(thread2);
+		thread2_running_flag = 2; 
+ 		if(!ret2)
+ 		 printk(KERN_INFO "Thread2 stopped: Good by from thread2 \n");
+		t2_counter = 0 ;
+	}
+
 
 	if ( kthread_should_stop() == true)
 	{

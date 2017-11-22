@@ -16,10 +16,18 @@ int main(int argc, char **argv){
  FILE *fptr;
  int fd;
  int ret;
+unsigned long long int random;
  unsigned long long int  stringToSend[BUFFER_LENGTH]={0,1,2,3,4,5};
+
+
+
    
  /*open file for the logging of messages*/
  fptr = fopen(FILEPATH, "wr+");
+
+random = rand()%4 +1;
+
+stringToSend[0] = 3;
 
  if (fptr == NULL) {
         printf( "File does not exists \n");
