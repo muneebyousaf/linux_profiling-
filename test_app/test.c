@@ -7,7 +7,7 @@
 #include<unistd.h>
 #include<string.h>
 
-#define BUFFER_LENGTH 256               ///< The buffer length (crude but fine)
+#define BUFFER_LENGTH 6               ///< The buffer length (crude but fine)
 static char receive[BUFFER_LENGTH];     ///< The receive buffer from the LKM
 
 #define NUMINTS  (1000)
@@ -26,13 +26,13 @@ int main(int argc, char **argv){
     int fd;
     int ret;
  
-char stringToSend[BUFFER_LENGTH]= "Muhammad muneeb yousaf";
+unsigned long long int  stringToSend[BUFFER_LENGTH]={0xFFFFFFFFFFFFFFFF,0x08000FF, 0xFFFFF,0xFFFFFFFF,0xFFFFFFFFFFFF,0xFFFFFFFFFFFFFFFF};
     /*  open for writing */
   fptr = fopen(FILEPATH, "wr+");
 
 // fptr = fopen(FILEPATH,O_RDWR|O_CREAT);
 
-	strcpy(stringToSend,argv[1]);
+	//strcpy(stringToSend,argv[1]);
 	//printf("The given arguments are %s \n", stringToSend);
  
     if (fptr == NULL)
@@ -48,7 +48,7 @@ char stringToSend[BUFFER_LENGTH]= "Muhammad muneeb yousaf";
      fprintf(fptr," failed to open the device \n");
       return 1 ;
    }
-   ret = write(fd, stringToSend, strlen(stringToSend)); // Send the string to the LKM
+   ret = write(fd, stringToSend, BUFFER_LENGTH); // Send the string to the LKM
    if (ret < 0){
       fprintf(fptr,"Failed to write the message to the device.");
       return ;

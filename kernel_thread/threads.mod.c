@@ -34,7 +34,6 @@ __attribute__((section("__versions"))) = {
 	{ 0x1000e51, __VMLINUX_SYMBOL_STR(schedule) },
 	{ 0x7d11c268, __VMLINUX_SYMBOL_STR(jiffies) },
 	{ 0x4f8b5ddb, __VMLINUX_SYMBOL_STR(_copy_to_user) },
-	{ 0x91715312, __VMLINUX_SYMBOL_STR(sprintf) },
 	{ 0x27e1a049, __VMLINUX_SYMBOL_STR(printk) },
 	{ 0xbdfb6dbb, __VMLINUX_SYMBOL_STR(__fentry__) },
 };
@@ -45,4 +44,4 @@ __attribute__((section(".modinfo"))) =
 "depends=";
 
 
-MODULE_INFO(srcversion, "7AC4B42C77CB9778B38AA28");
+MODULE_INFO(srcversion, "99102E83C16B8AFCF25EFC3");

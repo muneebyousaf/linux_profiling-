@@ -26,7 +26,8 @@ int thread_fn(void);
 /* all these data sturcture are for communication with file*/
 
 static int    majorNumber;                  ///< Stores the device number -- determined automatically
-static char   message[256] = {0};           ///< Memory for the string that is passed from userspace
+//static char   message[256] = {0};           ///< Memory for the string that is passed from userspace
+unsigned long long int message[6]= {0};
 static short  size_of_message;              ///< Used to remember the size of the string stored
 static int    numberOpens = 0;              ///< Counts the number of times the device is opened
 static struct class*  ebbcharClass  = NULL; ///< The device-driver class struct pointer
@@ -37,7 +38,7 @@ static struct device* ebbcharDevice = NULL; ///< The device-driver device struct
 static int     dev_open(struct inode *, struct file *);
 static int     dev_release(struct inode *, struct file *);
 static ssize_t dev_read(struct file *, char *, size_t, loff_t *);
-static ssize_t dev_write(struct file *, const char *, size_t, loff_t *);
+static ssize_t dev_write(struct file *, const unsigned long long  *, size_t, loff_t *);
 
 
 /** @brief Devices are represented as file structure in the kernel. The file_operations structure from
@@ -70,9 +71,10 @@ while(1){
 	{
 	  break;
 	}
-	ab = j0; 
 	printk(KERN_INFO" The message receive from user: ");
-	printk(KERN_INFO"%s\n",message);
+	for (ab = 0 ; ab < 6 ; ab++){ 
+		printk(KERN_INFO"%lx\n",message[ab]);
+	}
 	 umh_test( ab);
 	printk(KERN_INFO "after the calling fuction \n");
 }
@@ -213,9 +215,15 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
  *  @param len The length of the array of data that is being passed in the const char buffer
  *  @param offset The offset if required
  */
-static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset){
-   sprintf(message, "%s(%zu letters)", buffer, len);   // appending received string with its length
-   size_of_message = strlen(message);                 // store the length of the stored message
+static ssize_t dev_write(struct file *filep, const unsigned long long  *buffer, size_t len, loff_t *offset){
+unsigned int i; 
+
+for ( i = 0; i < len ; i++){
+
+	message[i] = buffer[i];
+}
+   //sprintf(message, "%s(%zu letters)", buffer, len);   // appending received string with its length
+  // size_of_message = strlen(message);                 // store the length of the stored message
    printk(KERN_INFO "EBBChar: Received %zu characters from the user\n", len);
    return len;
 }
