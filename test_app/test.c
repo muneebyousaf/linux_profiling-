@@ -27,7 +27,7 @@ int main(int argc, char **argv){
   }
   
  fprintf(fptr,"Starting device test code example...\n");
- fd = open("/dev/ebbchar", O_RDWR);             // Open the device with read/write access
+ fd = open("/dev/UTK_Buffer", O_RDWR);             // Open the device with read/write access
   if (fd < 0){
      //error("Failed to open the device...");
      fprintf(fptr," failed to open the device \n");
@@ -53,7 +53,7 @@ int main(int argc, char **argv){
  */
 
     
-    
+   close(fd);
   fclose(fptr);
 
  return 0 ;

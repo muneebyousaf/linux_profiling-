@@ -10,8 +10,8 @@
 #include <linux/vmalloc.h>
 #include <linux/device.h>
 
-#define  DEVICE_NAME "ebbchar"    ///< The device will appear at /dev/ebbchar using this value
-#define  CLASS_NAME  "ebb"        ///< The device class -- this is a character device driver
+#define  DEVICE_NAME "UTK_Buffer"    ///UTK: User To Kernel<The device will appear at /dev/ebbchar using this value
+#define  CLASS_NAME  "UTK"       ///< The device class -- this is a character device driver
 
 MODULE_LICENSE("GPL");            ///< The license type -- this affects available functionality
 MODULE_AUTHOR("Muhammad muneeb yousaf");    ///< The author -- visible when you use modinfo
@@ -19,14 +19,13 @@ MODULE_DESCRIPTION("This module is being created for communicatin between kernel
 MODULE_VERSION("0.1");            ///< A version number to inform users
 
 
- struct task_struct *thread1;
-static int umh_test( unsigned char);
+struct task_struct *thread1;
+static int Hook_User_App(void);
 
 int thread_fn(void); 
 /* all these data sturcture are for communication with file*/
 
 static int    majorNumber;                  ///< Stores the device number -- determined automatically
-//static char   message[256] = {0};           ///< Memory for the string that is passed from userspace
 unsigned long long int message[6]= {0};
 static short  size_of_message;              ///< Used to remember the size of the string stored
 static int    numberOpens = 0;              ///< Counts the number of times the device is opened
@@ -54,14 +53,19 @@ static struct file_operations fops =
 };
 
 /***********************************************************/
+/* **************** function related to first thread*******/
+/**********************************************************/
+
 
 int thread_fn() {
 
 unsigned long j0,j1;
 int delay = 10*HZ;
-unsigned char ab ; 
+unsigned char ab ;
+
+ 
 while(1){
-	printk(KERN_INFO "In thread1");
+	printk(KERN_INFO "In thread1\n");
 	j0 = jiffies;
 	j1 = j0 + delay;
 
@@ -71,45 +75,51 @@ while(1){
 	{
 	  break;
 	}
+
 	printk(KERN_INFO" The message receive from user: ");
 	for (ab = 0 ; ab < 6 ; ab++){ 
-		printk(KERN_INFO"%lx\n",message[ab]);
+		printk(KERN_INFO"%llx\n",message[ab]);
 	}
-	 umh_test( ab);
-	printk(KERN_INFO "after the calling fuction \n");
+	
+	/* Call user Space APP*/
+	Hook_User_App(); 
+
+ 
+	printk(KERN_INFO "Return from the user space \n");
+ }
+
+ return 0;
 }
 
-return 0;
-}
+
 
 int thread_init (void) {
-  
-
      
     char  our_thread[8]="thread1";
-    printk(KERN_INFO "in init");
+    printk(KERN_INFO "Init has started \n");
+
+
     thread1 = kthread_create(thread_fn,NULL,our_thread);
-    if((thread1))
-        {
-        printk(KERN_INFO "in if");
+    if((thread1)){
         wake_up_process(thread1);
-        }
+        printk(KERN_INFO "Thread 1 has started running\n");
+    }
 
 /* This is being added for communication through file*/
 /*****************************************************/
 
-  printk(KERN_INFO "EBBChar: Initializing the EBBChar LKM\n");
+  printk(KERN_INFO "UTK_Buffer: Initializing the UTK_Buffer parameters \n");
  
    // Try to dynamically allocate a major number for the device -- more difficult but worth it
    majorNumber = register_chrdev(0, DEVICE_NAME, &fops);
    if (majorNumber<0){
-      printk(KERN_ALERT "EBBChar failed to register a major number\n");
+      printk(KERN_ALERT "UTK_Buffer failed to register a major number\n");
       return majorNumber;
    }
 
  
 
-  printk(KERN_INFO "EBBChar: registered correctly with major number %d\n", majorNumber);
+  printk(KERN_INFO "UTK_Buffer: registered correctly with major number %d\n", majorNumber);
  
    // Register the device class
    ebbcharClass = class_create(THIS_MODULE, CLASS_NAME);
@@ -118,7 +128,7 @@ int thread_init (void) {
       printk(KERN_ALERT "Failed to register device class\n");
       return PTR_ERR(ebbcharClass);          // Correct way to return an error on a pointer
    }
-   printk(KERN_INFO "EBBChar: device class registered correctly\n"); 
+   printk(KERN_INFO "UTK_Buffer: device class registered correctly\n"); 
 
 
    // Register the device driver
@@ -129,7 +139,7 @@ int thread_init (void) {
       printk(KERN_ALERT "Failed to create the device\n");
       return PTR_ERR(ebbcharDevice);
    }
-   printk(KERN_INFO "EBBChar: device class created correctly\n"); // Made it! device was initialized
+   printk(KERN_INFO "UTK_Buffer: device class created correctly\n"); // Made it! device was initialized
 
 /*****************************************************/
    
@@ -138,9 +148,14 @@ int thread_init (void) {
 }
 
 
-static int umh_test(unsigned char  mynum )
+/**********************************************************/
+/**********User Space Caller function *********************/
+/*********************************************************/
+
+static int Hook_User_App() 
 {
   char *argv[] = { "/home/obc/github/linux_profiling-/test_app/test"," I am feeling Great !!!",NULL };
+
   static char *envp[] = {
         "HOME=/",
         "TERM=linux",
@@ -149,6 +164,12 @@ static int umh_test(unsigned char  mynum )
  
  return call_usermodehelper( argv[0], argv, envp, UMH_WAIT_PROC );
 }
+
+
+
+/*******************************************************************/
+/******* Remove module, threads and inits stuff from the kernel*****/
+/******************************************************************/
 
 void thread_cleanup(void) {
  int ret;
@@ -163,7 +184,7 @@ void thread_cleanup(void) {
    class_unregister(ebbcharClass);                          // unregister the device class
    class_destroy(ebbcharClass);                             // remove the device class
    unregister_chrdev(majorNumber, DEVICE_NAME);             // unregister the major number
-   printk(KERN_INFO "EBBChar: Goodbye from the LKM!\n");
+   printk(KERN_INFO "UTK_buffer: Goodbye from the from ITU test bench!\n");
 
 }
 /*********************************************/
@@ -177,7 +198,7 @@ void thread_cleanup(void) {
  */
 static int dev_open(struct inode *inodep, struct file *filep){
    numberOpens++;
-   printk(KERN_INFO "EBBChar: Device has been opened %d time(s)\n", numberOpens);
+   printk(KERN_INFO "UTK_Buffer: Buffer has been opened %d time(s)\n", numberOpens);
    return 0;
 }
 
@@ -220,11 +241,11 @@ unsigned int i;
 
 for ( i = 0; i < len ; i++){
 
-	message[i] = buffer[i];
+	message[i] = buffer[i]; /* Copying the user data into the kernel buffer*/
 }
-   //sprintf(message, "%s(%zu letters)", buffer, len);   // appending received string with its length
-  // size_of_message = strlen(message);                 // store the length of the stored message
-   printk(KERN_INFO "EBBChar: Received %zu characters from the user\n", len);
+
+printk(KERN_INFO "UTK_Buffer: Received %zu characters from the user\n", len);
+
    return len;
 }
  
@@ -234,7 +255,7 @@ for ( i = 0; i < len ; i++){
  *  @param filep A pointer to a file object (defined in linux/fs.h)
  */
 static int dev_release(struct inode *inodep, struct file *filep){
-   printk(KERN_INFO "EBBChar: Device successfully closed\n");
+   printk(KERN_INFO "UTK_Buffer:Buffer successfully closed\n");
    return 0;
 }
 
