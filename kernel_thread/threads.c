@@ -21,7 +21,8 @@ unsigned int t2_counter= 0;
 struct task_struct *thread1;
 
 struct task_struct *thread2;
-static int Hook_User_App(void);
+static int Hook_User_App1(void);
+static int Hook_User_App2(void);
 
 int thread_fn(void); 
 int thread_fn2(void); 
@@ -68,12 +69,7 @@ char buffer[20];
 char mythread[20]="thread";
 
 while(1){
-	
-		
-	sprintf(buffer,"%d",a);
 
-	strcat(mythread,buffer);
-	printk(KERN_INFO " Result of cancatination%s\n",mythread);
 	printk(KERN_INFO "In thread2\n");
 	j0 = jiffies;
 	j1 = j0 + delay;
@@ -112,13 +108,13 @@ while(1){
 	while (time_before(jiffies, j1))
         	schedule();
 
-	if ((message[0] == 3)&& (thread2_running_flag == 2)){
+     /*	if ((message[0] == 3)&& (thread2_running_flag == 2)){
 
 		thread2_running_flag = 0;
-	} 
+	} */
 	
 	/**********Create Thread2**********************/
-	if(thread2_running_flag == 0U ){
+	/*if(thread2_running_flag == 0U ){
 	 	thread2= kthread_create(thread_fn2,NULL,our_thread2);
     		if((thread2)){
         		wake_up_process(thread2);
@@ -127,19 +123,19 @@ while(1){
 		}
     	}
 	else
-        printk(KERN_INFO "Thread 2 not created \n");
+        printk(KERN_INFO "Thread 2 not created \n");*/
 
 	/**************************************************/
 	/****Stop thread2********************************/
 
-	if(t2_counter >= 2){
+	/*if(t2_counter >= 2){
 
 		ret2 = kthread_stop(thread2);
 		thread2_running_flag = 2; 
  		if(!ret2)
  		 printk(KERN_INFO "Thread2 stopped: Good by from thread2 \n");
 		t2_counter = 0 ;
-	}
+	}*/
 
 
 	if ( kthread_should_stop() == true)
@@ -147,14 +143,15 @@ while(1){
 	  break;
 	}
 
+	
+	/* Call user Space APP*/
+	Hook_User_App1(); 
+
 	printk(KERN_INFO" The message receive from user: ");
 	for (ab = 0 ; ab < 6 ; ab++){ 
 		printk(KERN_INFO"%llx\n",message[ab]);
+		message[ab] = 0 ; 
 	}
-	
-	/* Call user Space APP*/
-	Hook_User_App(); 
-
  
 	printk(KERN_INFO "Return from the user space \n");
  }
@@ -223,15 +220,17 @@ int thread_init (void) {
 /**********User Space Caller function *********************/
 /*********************************************************/
 
-static int Hook_User_App() 
+static int Hook_User_App1() 
 {
-  char *argv[] = { "/home/obc/github/linux_profiling-/test_app/test"," I am feeling Great !!!",NULL };
 
+	printk(KERN_INFO"From hook1 API \n");
+ char *argv[] = {"/home/obc/github/linux_profiling-/papi_example_highlevel/papi_mult",NULL };
+//char *argv[] = { "/home/obc/github/linux_profiling-/test_app/test", NULL };
   static char *envp[] = {
         "HOME=/",
         "TERM=linux",
-	"SHELL=/bin/bash"
-        "PATH=/sbin:/bin:/usr/sbin:/usr/bin", NULL };
+	"SHELL=/bin/bash",
+        "PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/lib", NULL };
  
  return call_usermodehelper( argv[0], argv, envp, UMH_WAIT_PROC );
 }

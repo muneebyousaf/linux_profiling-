@@ -8,9 +8,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <papi.h>
+#include "F_comm.c"
 #define NUM_EVENTS 4 
 #define THRESHOLD 10000
 #define ERROR_RETURN(retval) { fprintf(stderr, "Error %d %s:line %d: \n", retval,__FILE__,__LINE__);  exit(retval); }
+
+#define FILEPATH1 "/home/obc/github/linux_profiling-/papi_example_highlevel/Addition_log.txt"
+
 /* stupid codes to be monitored */ 
 void computation_mult()
 {
@@ -31,7 +35,9 @@ void computation_add()
       tmp = tmp + i;
    }
 }
-int main()
+
+unsigned long long counter_buffer[6];
+int main(void)
 {
    /*Declaring and initializing the event set with the presets*/
 
@@ -40,10 +46,19 @@ int main()
     * executed, Total load/store instructions executed and Total 
     * branch instructions executed.
    **************************************************************/ 
+     FILE *fptr;
+	int i ; 
+
+	fptr = fopen(FILEPATH1, "wr+");
+
 	
    int Events_set1[3] = {PAPI_TOT_INS,PAPI_BR_INS,PAPI_LD_INS};
 
-
+	/* initilizations of buffer*/
+	for ( i = 0;  i< 6; i++){
+		counter_buffer[i] = 0xFFFF;
+	}
+	
 
        
 
@@ -85,10 +100,10 @@ int main()
     **************************************************************************/
    if ((num_hwcntrs = PAPI_num_counters()) < PAPI_OK)
    {
-      printf("There are no counters available. \n");
+      fprintf(fptr,"There are no counters available. \n");
       exit(1);
    }
-   printf("There are %d counters in this system\n",num_hwcntrs);
+   fprintf(fptr,"There are %d counters in this system\n",num_hwcntrs);
                
    /**************************************************************************
     * PAPI_start_counters initializes the PAPI library (if necessary) and    *
@@ -104,17 +119,18 @@ int main()
 
    if ( (retval = PAPI_start_counters(Events_set1, 3)) != PAPI_OK)
        ERROR_RETURN(retval);
-   printf("\nCounter Started: \n");
+   fprintf(fptr,"\nCounter Started for the for additon: \n");
    /* Your code goes here*/
-   computation_add();
-       
+     
+    computation_add();
+    //computation_mult();
  
    /**********************************************************************
     * PAPI_read_counters reads the counter values into values array      *
     **********************************************************************/
    if ( (retval=PAPI_read_counters(values, 3)) != PAPI_OK)
       ERROR_RETURN(retval);
-   printf("Read successfully\n");
+   fprintf(fptr,"Read successfully\n");
 
 
    /******************* PAPI_stop_counters **********************************/
@@ -125,58 +141,18 @@ int main()
    end_cycles =PAPI_get_real_cyc();
    end_usec   = PAPI_get_real_usec();
 
-   printf("counter are stopped \n");     
+   fprintf(fptr,"counter are stopped \n");     
 
-       
-   printf("The total instructions executed for addition are %lld \n",values[0]);
-   printf("The total branch instructions executed for addition are %lld \n",values[1]);
-   printf("The total Load instructions executed for addition are  %lld \n", values[2] );
-   printf("Wallclock cycles  : %lld\nWallclock time(us): %lld\n",end_cycles-start_cycles,end_usec-start_usec);
+    counter_buffer[3] = values[0];
+   fprintf(fptr,"The total instructions executed for addition are %lld \n",values[0]);
+    counter_buffer[4] =  values[1];
+   fprintf(fptr,"The total branch instructions executed for addition are %lld \n",values[1]);
+    counter_buffer[5] =  values[2];
+   fprintf(fptr,"The total Load instructions executed for addition  are  %lld \n", values[2] );
+   fprintf(fptr,"Wallclock cycles  : %lld\nWallclock time(us): %lld\n",end_cycles-start_cycles,end_usec-start_usec);
 
+   file_handler(counter_buffer); /* Send data to excnage with the kernel*/
+	fclose(fptr);
 
-  /****************************************************************************/
-  /* Calculations for cache misses*********************************/
-  /*****************************************************************/
-
-
-   /*start time sampling*/     
-   start_cycles =PAPI_get_real_cyc();
-   start_usec   = PAPI_get_real_usec();
-
-
-   if ( (retval = PAPI_start_counters(Events_set2, 2)) != PAPI_OK)
-       ERROR_RETURN(retval);
-
-
-   printf("\nCounter Started: \n");
-   /* Your code goes here*/
-   computation_add();
-       
- 
-   /**********************************************************************
-    * PAPI_read_counters reads the counter values into values array      *
-    **********************************************************************/
-   if ( (retval=PAPI_read_counters(values, 2)) != PAPI_OK)
-      ERROR_RETURN(retval);
-   printf("Read successfully\n");
-
-
-   /******************* PAPI_stop_counters **********************************/
-   if ((retval=PAPI_stop_counters(values, 2)) != PAPI_OK)
-      ERROR_RETURN(retval); 
-  
-    /* stop time sampling*/ 
-   end_cycles =PAPI_get_real_cyc();
-   end_usec   = PAPI_get_real_usec();
-
-   printf("counter are stopped\n");     
-
-       
-   printf("L1 data cahe mises  %lld \n",values[0]);
-   printf("L1 instruction cache misses  %lld \n",values[1]);
- //printf("L2 data cache misses  %lld \n", values[2] );
-   printf("Wallclock cycles  : %lld\nWallclock time(us): %lld\n",end_cycles-start_cycles,end_usec-start_usec);
-
-  
    exit(0);     
 }

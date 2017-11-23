@@ -1,10 +1,11 @@
 #this  make file is being written to test the papi  library 
 
 all:
-	gcc papi.c -o papi_test -lpapi
+	gcc papi_mult.c -o papi_mult  -lpapi
+	gcc papi_add.c -o papi_add  -lpapi
 run: 
 	./papi_test
 clean:
-	rm -f  *.o *~ papi_test *.out
+	rm -f  *.o *.txt *~ papi_add papi_mult *.out
 
  
