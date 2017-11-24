@@ -9,8 +9,9 @@
 #include <stdlib.h>
 #include <papi.h>
 #include "F_comm.c"
+#include "thread_config.h"
 #define NUM_EVENTS 4 
-#define THRESHOLD 10000
+#define THRESHOLD 10
 #define ERROR_RETURN(retval) { fprintf(stderr, "Error %d %s:line %d: \n", retval,__FILE__,__LINE__);  exit(retval); }
 
 #define FILEPATH1 "/home/obc/github/linux_profiling-/papi_example_highlevel/Addition_log.txt"
@@ -20,6 +21,8 @@ void computation_mult()
 {
    double tmp=1.0;
    int i=1;
+
+printf(" print from multiplication");
    for( i = 1; i < THRESHOLD; i++ )
    {
       tmp = tmp*i;
@@ -30,9 +33,12 @@ void computation_add()
 {
    int tmp = 0;
    int i=0;
+	printf("this is carzty");
    for( i = 0; i < THRESHOLD; i++ )
    {
-      tmp = tmp + i;
+	if ( i%2 == 0){
+     		 tmp = tmp + i;	
+	}
    }
 }
 
@@ -123,7 +129,7 @@ int main(void)
    /* Your code goes here*/
      
     computation_add();
-    //computation_mult();
+    computation_mult();
  
    /**********************************************************************
     * PAPI_read_counters reads the counter values into values array      *

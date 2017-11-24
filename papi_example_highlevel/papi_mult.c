@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <papi.h>
 #include "F_comm.c"
+#include "thread_config.h"
 #define NUM_EVENTS 4 
 #define THRESHOLD 10000
 #define ERROR_RETURN(retval) { fprintf(stderr, "Error %d %s:line %d: \n", retval,__FILE__,__LINE__);  exit(retval); }
@@ -20,6 +21,8 @@ void computation_mult()
 {
    double tmp=1.0;
    int i=1;
+
+	printf(" this multiafkldj \n");
    for( i = 1; i < THRESHOLD; i++ )
    {
       tmp = tmp*i;

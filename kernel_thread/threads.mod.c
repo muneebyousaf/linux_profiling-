@@ -20,16 +20,17 @@ __attribute__((section("__versions"))) = {
 	{ 0x99ed5c78, __VMLINUX_SYMBOL_STR(module_layout) },
 	{ 0x18600f57, __VMLINUX_SYMBOL_STR(class_unregister) },
 	{ 0x35ad15f, __VMLINUX_SYMBOL_STR(device_destroy) },
-	{ 0xd052978c, __VMLINUX_SYMBOL_STR(kthread_stop) },
 	{ 0x6bc3fbc0, __VMLINUX_SYMBOL_STR(__unregister_chrdev) },
 	{ 0x25e525ff, __VMLINUX_SYMBOL_STR(class_destroy) },
-	{ 0xabe2c44c, __VMLINUX_SYMBOL_STR(wake_up_process) },
-	{ 0xdb7305a1, __VMLINUX_SYMBOL_STR(__stack_chk_fail) },
 	{ 0x8da235c0, __VMLINUX_SYMBOL_STR(device_create) },
 	{ 0x5ec61c4, __VMLINUX_SYMBOL_STR(__class_create) },
 	{ 0x88a19beb, __VMLINUX_SYMBOL_STR(__register_chrdev) },
-	{ 0xb8672fb5, __VMLINUX_SYMBOL_STR(kthread_create_on_node) },
 	{ 0x4f8b5ddb, __VMLINUX_SYMBOL_STR(_copy_to_user) },
+	{ 0xdb7305a1, __VMLINUX_SYMBOL_STR(__stack_chk_fail) },
+	{ 0xd052978c, __VMLINUX_SYMBOL_STR(kthread_stop) },
+	{ 0xabe2c44c, __VMLINUX_SYMBOL_STR(wake_up_process) },
+	{ 0x42cfb093, __VMLINUX_SYMBOL_STR(kthread_bind) },
+	{ 0xb8672fb5, __VMLINUX_SYMBOL_STR(kthread_create_on_node) },
 	{ 0xc5fdef94, __VMLINUX_SYMBOL_STR(call_usermodehelper) },
 	{ 0xb3f7646e, __VMLINUX_SYMBOL_STR(kthread_should_stop) },
 	{ 0x1000e51, __VMLINUX_SYMBOL_STR(schedule) },
@@ -44,4 +45,4 @@ __attribute__((section(".modinfo"))) =
 "depends=";
 
 
-MODULE_INFO(srcversion, "C68A07F33EC7BB61E21284B");
+MODULE_INFO(srcversion, "01E279AA862B5BBC40B90D9");

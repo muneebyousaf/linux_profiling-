@@ -6,7 +6,7 @@
 #include<string.h>
 #include<unistd.h>
 #include<string.h>
-
+#include "thread_config.h"
 #define BUFFER_LENGTH 6               ///< The buffer length (crude but fine)
 
 #define FILEPATH "/home/obc/github/linux_profiling-/papi_example_highlevel/FComm_log.txt"
@@ -26,12 +26,20 @@ int i;
 
 //random = rand()%4 +1;
 
+/* Thread configurations*/
+
+stringToSend[0] = create_thread1;
+stringToSend[1] = thread1_run_counter;
+stringToSend[2] = thread1_period_in_sec;
+stringToSend[3] = create_thread2 ;
+stringToSend[4] = thread2_run_counter ;
+stringToSend[5] =  thread2_period_in_sec;
 
 
 for (i = 0 ; i < 6 ;i++){
 //unsigned long long int random;
 // unsigned long long int  stringToSend[BUFFER_LENGTH]={0,1,2,3,4,5};
- printf("Counter values: %lld \n", stringToSend[i]);
+fprintf(fptr,"Counter values: %lld \n", stringToSend[i]);
 }
 
  if (fptr == NULL) {

@@ -64,20 +64,23 @@ int thread_fn2() {
 
  unsigned long j0,j1;
  int delay = 20*HZ;
-int a =10;
+int ab;
 char buffer[20];
 char mythread[20]="thread";
 
 while(1){
 
-	printk(KERN_INFO "In thread2\n");
 	j0 = jiffies;
+	if((message[5]> 0)  && (message[5] < 20) ) 
+	{
+		delay = message[5]*HZ; /*set the current period in sec*/
+	}
 	j1 = j0 + delay;
 
 	while (time_before(jiffies, j1))
         	schedule();
 
-
+	
 	if ( kthread_should_stop() == true)
 	{
 	  break;
@@ -86,6 +89,16 @@ while(1){
 	printk(KERN_INFO " It is from thread2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 
  
+	
+	/* Call user Space APP*/
+	Hook_User_App2(); 
+
+	printk(KERN_INFO" The message receive from user2: ");
+	for (ab = 0 ; ab < 6 ; ab++){ 
+		printk(KERN_INFO"%lld\n",message[ab]);
+	}
+ 
+	printk(KERN_INFO "Return from the user space2 \n");
  }
  return 0; 
 }
@@ -94,52 +107,69 @@ int thread_fn() {
 unsigned long j0,j1;
 int delay = 20*HZ;
 unsigned char ab ;
-char our_thread2[8]="Thread2";
+char our_thread2[8]="thread2";
 
 unsigned char thread2_running_flag = 0;
 
 int ret2;
  
 while(1){
-	printk(KERN_INFO "In thread1\n");
 	j0 = jiffies;
+
+	if((message[2]) > 0  && (message[2] < 20))
+	{
+		delay = message[2]*HZ;
+	}
+
 	j1 = j0 + delay;
 
 	while (time_before(jiffies, j1))
         	schedule();
 
-     /*	if ((message[0] == 3)&& (thread2_running_flag == 2)){
+	printk(KERN_INFO "In thread1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+     	if ((message[3] == 1)&& (thread2_running_flag == 2)){
 
 		thread2_running_flag = 0;
-	} */
+	} 
 	
 	/**********Create Thread2**********************/
-	/*if(thread2_running_flag == 0U ){
+	if(thread2_running_flag == 0U ){
 	 	thread2= kthread_create(thread_fn2,NULL,our_thread2);
     		if((thread2)){
+      			kthread_bind(thread2, 0);
         		wake_up_process(thread2);
 			thread2_running_flag = 1; 
         		printk(KERN_INFO "Thread 1 has started running\n");
 		}
-    	}
-	else
-        printk(KERN_INFO "Thread 2 not created \n");*/
+		else
+        	   printk(KERN_INFO "Thread 2 not created \n");
 
+    	}
 	/**************************************************/
 	/****Stop thread2********************************/
 
-	/*if(t2_counter >= 2){
+	if(t2_counter >= message[5]){
 
 		ret2 = kthread_stop(thread2);
 		thread2_running_flag = 2; 
  		if(!ret2)
  		 printk(KERN_INFO "Thread2 stopped: Good by from thread2 \n");
 		t2_counter = 0 ;
-	}*/
+	}
 
 
 	if ( kthread_should_stop() == true)
 	{
+		
+	  if ( thread2_running_flag == 1) {
+		ret2 = kthread_stop(thread2);
+                thread2_running_flag = 2;
+                if(!ret2)
+                 printk(KERN_INFO "Thread2 stopped: Good by from thread2 \n");
+                t2_counter = 0 ;
+
+	
+	   }
 	  break;
 	}
 
@@ -147,13 +177,12 @@ while(1){
 	/* Call user Space APP*/
 	Hook_User_App1(); 
 
-	printk(KERN_INFO" The message receive from user: ");
+	printk(KERN_INFO" The message receive from user1: ");
 	for (ab = 0 ; ab < 6 ; ab++){ 
-		printk(KERN_INFO"%llx\n",message[ab]);
-		message[ab] = 0 ; 
+		printk(KERN_INFO"%lld\n",message[ab]);
 	}
  
-	printk(KERN_INFO "Return from the user space \n");
+	printk(KERN_INFO "Return from the user space1 \n");
  }
 
  return 0;
@@ -169,6 +198,9 @@ int thread_init (void) {
 
     thread1 = kthread_create(thread_fn,NULL,our_thread);
     if((thread1)){
+	
+      kthread_bind(thread1, 0);
+	
         wake_up_process(thread1);
         printk(KERN_INFO "Thread 1 has started running\n");
     }
@@ -237,6 +269,20 @@ static int Hook_User_App1()
 
 
 
+static int Hook_User_App2() 
+{
+
+	printk(KERN_INFO"From hook2 API \n");
+ char *argv[] = {"/home/obc/github/linux_profiling-/papi_example_highlevel/papi_add",NULL };
+//char *argv[] = { "/home/obc/github/linux_profiling-/test_app/test", NULL };
+  static char *envp[] = {
+        "HOME=/",
+        "TERM=linux",
+	"SHELL=/bin/bash",
+        "PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/lib", NULL };
+ 
+ return call_usermodehelper( argv[0], argv, envp, UMH_WAIT_PROC );
+}
 /*******************************************************************/
 /******* Remove module, threads and inits stuff from the kernel*****/
 /******************************************************************/
@@ -245,7 +291,12 @@ void thread_cleanup(void) {
  int ret;
  ret = kthread_stop(thread1);
  if(!ret)
-  printk(KERN_INFO "Thread stopped");
+  printk(KERN_INFO "Thread1  stopped");
+
+ //ret = kthread_stop(thread2);
+// if(!ret)
+ // printk(KERN_INFO "Thread2 stopped");
+
   /*********************************************************/
   /****FILE Removal*****************************************/
   /********************************************************/
